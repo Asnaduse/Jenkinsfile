@@ -1,0 +1,58 @@
+pipeline {
+    agent any
+
+    environment {
+        GIT_CREDENTIALS_ID = 'your-credentials-id' // Replace with your actual credential ID
+        REPO_URL = 'https://github.com/Asnaduse/jenkins.git'
+        BRANCH = 'main' // Change to master if needed
+    }
+
+    stages {
+        stage('Clean Workspace') {
+            steps {
+                echo 'Cleaning workspace...'
+                deleteDir()
+            }
+        }
+
+        stage('Checkout Code') {
+            steps {
+                echo 'Checking out source code...'
+                git branch: "${BRANCH}", credentialsId: "${GIT_CREDENTIALS_ID}", url: "${REPO_URL}"
+            }
+        }
+
+        stage('Build') {
+            steps {
+                echo 'Building the project...'
+                sh 'npm install' // Change this based on your project
+            }
+        }
+
+        stage('Test') {
+            steps {
+                echo 'Running tests...'
+                sh 'npm test' // Change this based on your project
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                echo 'Deploying the application...'
+                sh 'echo Deploying...' // Replace with your actual deployment script
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'This post-action runs regardless of the build result.'
+        }
+        success {
+            echo 'Build succeeded!'
+        }
+        failure {
+            echo 'Build failed!'
+        }
+    }
+}
