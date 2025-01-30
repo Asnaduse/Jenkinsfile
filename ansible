@@ -1,0 +1,46 @@
+pipeline {
+    agent any
+    
+    environment {
+        ANSIBLE_CONFIG = '.ansible.cfg'  // Path to your Ansible config file (optional)
+        ANSIBLE_INVENTORY = 'hosts.ini'  // Inventory file for Ansible (optional)
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // Checkout the Git repository containing the Ansible playbook
+                git 'https://github.com/yourusername/ansible-playbooks.git'
+            }
+        }
+
+        stage('Install Ansible') {
+            steps {
+                // Install Ansible if not installed, or use Docker to run Ansible (if needed)
+                sh '''
+                    sudo apt update
+                    sudo apt install -y ansible
+                '''
+            }
+        }
+
+        stage('Run Ansible Playbook') {
+            steps {
+                // Run the Ansible playbook
+                sh '''
+                    ansible-playbook -i ${ANSIBLE_INVENTORY} playbook.yml --extra-vars "env=prod"
+                '''
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Ansible playbook executed successfully.'
+        }
+
+        failure {
+            echo 'Ansible playbook failed. Check the logs.'
+        }
+    }
+}
